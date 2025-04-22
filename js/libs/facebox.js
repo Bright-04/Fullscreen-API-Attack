@@ -125,7 +125,15 @@
       $('#facebox .content').append(data)
       $('#facebox .loading').remove()
       $('#facebox .body').children().fadeIn('normal')
-      $('#facebox').css('left', $(window).width() / 2 - ($('#facebox .popup').width() / 2))
+      
+      // Center the facebox properly
+      $('#facebox').css({
+        'position': 'fixed',
+        'top': '50%',
+        'left': '50%',
+        'transform': 'translate(-50%, -50%)'
+      });
+      
       $(document).trigger('reveal.facebox').trigger('afterReveal.facebox')
     },
 
