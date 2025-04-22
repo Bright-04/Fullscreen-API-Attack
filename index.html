@@ -13,8 +13,29 @@
 </head>
 <body>
 
-  <div class="warning-banner">
-    This is an educational security demonstration only.
+  <div class="warning-banner" role="alert">
+    <div class="warning-content">
+      <span class="warning-icon">⚠️</span>
+      <div class="warning-text">
+        <strong>Security Demonstration:</strong> This is an educational tool showing how malicious websites can exploit the Fullscreen API to create convincing phishing attacks. No real data is collected.
+      </div>
+      <button id="learn-more" class="warning-button learn-more">Learn More</button>
+      <button id="dismiss-warning" class="warning-button dismiss">Dismiss</button>
+    </div>
+  </div>
+
+  <div id="more-info" style="display: none;">
+    <p>
+      <strong>About This Security Demonstration</strong><br><br>
+      This demo illustrates how attackers can use the HTML5 Fullscreen API to create convincing fake interfaces that mimic legitimate websites and operating systems.<br><br>
+      
+      <strong>What You'll See:</strong><br>
+      • When you click the YouTube link, the page will request fullscreen permission<br>
+      • Once granted, a fake browser and OS interface will appear<br>
+      • Any interaction will reveal that you've been "phished"<br><br>
+      
+      <strong>Remember:</strong> Always verify website URLs before entering sensitive information and be cautious of unexpected fullscreen requests.
+    </p>
   </div>
 
   <a class="spoofLink" href="https://www.youtube.com" rel="noopener noreferrer">YouTube</a>
