@@ -33,6 +33,35 @@ html.fullscreened {
 #spoofMenu, #spoofBrowser { width: 100%; }
 
 
+/* Warning banner */
+.warning-banner {
+  background-color: #ffe57f;
+  color: #333;
+  text-align: center;
+  padding: 10px;
+  font-weight: bold;
+  position: relative;
+  z-index: 3;
+}
+
+.fullscreened .warning-banner {
+  display: none;
+}
+
+#exitFullscreen {
+  background-color: #f44336;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+#exitFullscreen:hover {
+  background-color: #d32f2f;
+}
+
 /* Menu (OS X only) */
 
 .osx #spoofMenu { height: 22px; }

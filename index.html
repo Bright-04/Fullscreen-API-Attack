@@ -2,18 +2,22 @@
 <html class="no-js" lang="en">
 <head>
   <meta charset="utf-8">
-
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Fullscreen API Attack</title>
-  <meta name="description" content="">
+  <meta name="description" content="Educational demonstration of Fullscreen API security risks">
 
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/facebox.css">
 </head>
 <body>
 
-  <a class="spoofLink" href="https://www.youtube.com">YouTube</a>
+  <div class="warning-banner">
+    This is an educational security demonstration only.
+  </div>
+
+  <a class="spoofLink" href="https://www.youtube.com" rel="noopener noreferrer">YouTube</a>
 
   <div id="spoofHeader">
     <div id="spoofMenu"></div>
@@ -21,14 +25,22 @@
   </div>
 
   <div id="spoofSite">
-    <img src="img/YouTube-HQ.png">
+    <img src="img/YouTube-HQ.png" alt="YouTube screenshot">
   </div>
 
   <div id="phished" style="display: none;">
     <p>
-      <b>Whoa, that was a close one!</b><br><br>
-      <img src="img/surprised-gasp-l.png"><br><br>
+      <b>For real? Are you for real?</b><br><br>
+      <img src="img/haha-you-fool.jpg" alt="Warning"><br><br>
       <b>Don't get phished.</b> You're looking at fake OS and browser UI.
+      <br><br>
+      <b>Team Information:</b><br>
+      Đặng Hữu Lộc - 22110052<br>
+      Nguyễn Nhật Quang - 22110065<br>
+      Nguyễn Quang Sáng - 22110067<br>
+      Hồ Thành Đạt - 22110020
+      <br><br>
+      <button id="exitFullscreen">Exit Fullscreen</button>
     </p>
   </div>
 
@@ -39,7 +51,6 @@
   <script src="js/libs/fullscreen-api-shim.js"></script>
 
   <script src="js/script.js"></script>
-
 
 </body>
 </html>
