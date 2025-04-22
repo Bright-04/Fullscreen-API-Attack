@@ -104,8 +104,7 @@
       showOverlay()
 
       $('#facebox .content').empty()
-      $('#facebox .body').children().hide().end().
-        append('<div class="loading"><img src="'+$.facebox.settings.loadingImage+'"/></div>')
+      $('#facebox .body').children().hide().end().append('<div class="loading"><img src="'+$.facebox.settings.loadingImage+'"/></div>')
 
       $('#facebox').css({
         top:	getPageScroll()[1] + (getPageHeight() / 10),
@@ -256,11 +255,16 @@
     image.onload = function() {
       $.facebox.reveal('<div class="image"><img src="' + image.src + '" /></div>', klass)
     }
+    image.onerror = function() {
+      $.facebox.reveal('<div class="error">Failed to load image.</div>', klass)
+    }
     image.src = href
   }
 
   function fillFaceboxFromAjax(href, klass) {
-    $.get(href, function(data) { $.facebox.reveal(data, klass) })
+    $.get(href, function(data) { $.facebox.reveal(data, klass) }).fail(function() {
+      $.facebox.reveal('<div class="error">Failed to load content.</div>', klass)
+    })
   }
 
   function skipOverlay() {

@@ -25,6 +25,7 @@ var BrowserDetect = {
     return parseFloat(dataString.substring(index+this.versionSearchString.length+1));
   },
   dataBrowser: [
+    // Many outdated browsers listed here (OmniWeb, iCab, etc.)
     {
       string: navigator.userAgent,
       subString: "Chrome",
