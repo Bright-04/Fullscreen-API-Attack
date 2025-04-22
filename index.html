@@ -109,20 +109,38 @@
   </div>
 
   <div id="phished" style="display: none;">
-    <p>
-      <b><span class="material-icons" style="vertical-align: middle; font-size: 28px; color: #f44336;">warning</span> You Have Been Phished!</b><br><br>
-      <img src="img/haha-you-fool.jpg" alt="Warning"><br><br>
-      <b style="font-size: 18px;">This is a phishing simulation.</b><br>
-      You're currently viewing a <u>fake operating system and browser interface</u>.<br>
-      Be cautious — always verify URLs and avoid entering sensitive information on suspicious pages.
-      <br><br>
-      <b>Team Members:</b><br>
-      Đặng Hữu Lộc - 22110052<br>
-      Nguyễn Nhật Quang - 22110065<br>
-      Nguyễn Quang Sáng - 22110067<br>
-      Hồ Thành Đạt - 22110020
-      <br><br>
-    </p>
+    <div class="phished-content">
+      <div class="phished-header">
+        <span class="material-icons phished-icon">warning</span>
+        <h2>You Have Been Phished!</h2>
+        <button class="close-btn" onclick="$(document).trigger('close.facebox')">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      
+      <div class="phished-body">
+        <img src="img/haha-you-fool.jpg" alt="Warning" class="phished-image">
+        
+        <div class="phished-message">
+          <h3>This is a phishing simulation</h3>
+          <p>You're currently viewing a <u>fake operating system and browser interface</u>.</p>
+          <p>Be cautious — always verify URLs and avoid entering sensitive information on suspicious pages.</p>
+        </div>
+        
+        <div class="team-members">
+          <h4>Team Members:</h4>
+          <p>Đặng Hữu Lộc - 22110052</p>
+          <p>Nguyễn Nhật Quang - 22110065</p>
+          <p>Nguyễn Quang Sáng - 22110067</p>
+          <p>Hồ Thành Đạt - 22110020</p>
+        </div>
+        
+        <div class="phished-actions">
+          <button class="md-button reset-demo" onclick="resetDemo()">Reset Demo</button>
+          <button class="md-button close-dialog" onclick="$(document).trigger('close.facebox')">Close</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script src="js/libs/jquery-1.7.2.js"></script>
