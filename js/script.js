@@ -47,6 +47,27 @@ function detectBrowser() {
   return BrowserDetect.browser; // fallback to the old detection
 }
 
+// Function to reset the demo state
+function resetDemo() {
+  // Reset any fullscreen state
+  if (document.fullscreenElement) {
+    exitFullScreen();
+  }
+  
+  // Reset classes
+  $('html').removeClass('fullscreened');
+  $('html').addClass('not-fullscreened');
+  
+  // Show warning banner again
+  $('.warning-banner').show();
+  
+  // Reset any other state as needed
+  $('#phished').hide();
+  
+  // Scroll back to the top
+  window.scrollTo(0, 0);
+}
+
 $(function() {
   // Preload target site image with modern approach
   $('#spoofSite img').each(function(i, img) {
@@ -62,6 +83,11 @@ $(function() {
   $('#exitFullscreen').on('click', function() {
     exitFullScreen();
     $.facebox.close();
+  });
+
+  // Add event handler for facebox close to reset the demo
+  $(document).bind('close.facebox', function() {
+    setTimeout(resetDemo, 300); // Small delay to let the facebox close animation complete
   });
 
   // Detect if the demo will run on user's browser
