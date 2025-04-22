@@ -43,13 +43,13 @@ This project demonstrates how malicious websites could potentially use the HTML5
 
 ## Demo
 
-Visit the [live demo](https://yourusername.github.io/Fullscreen-API-Attack/) to see the YouTube spoofing attack in action. The demo shows how a fake YouTube interface could be used to trick users into believing they're on the legitimate site.
+Visit the [live demo](https://Bright-04.github.io/Fullscreen-API-Attack/) to see the YouTube spoofing attack in action. The demo shows how a fake YouTube interface could be used to trick users into believing they're on the legitimate site.
 
 ## Installation
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/Fullscreen-API-Attack.git
+git clone https://github.com/Bright-04/Fullscreen-API-Attack.git
 
 # Navigate to the project directory
 cd Fullscreen-API-Attack
