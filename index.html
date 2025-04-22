@@ -19,8 +19,6 @@
       <div class="warning-text">
         <strong>Security Demonstration:</strong> This is an educational tool showing how malicious websites can exploit the Fullscreen API to create convincing phishing attacks. No real data is collected.
       </div>
-      <button id="learn-more" class="warning-button learn-more">Learn More</button>
-      <button id="dismiss-warning" class="warning-button dismiss">Dismiss</button>
     </div>
   </div>
 
@@ -38,7 +36,64 @@
     </p>
   </div>
 
-  <a class="spoofLink" href="https://www.youtube.com" rel="noopener noreferrer">YouTube</a>
+  <div class="content">
+    <h1>Understanding the Fullscreen API</h1>
+    <p>
+        The Fullscreen API is a powerful feature of modern web browsers that allows web applications to present content in fullscreen mode. 
+        While it can enhance user experience, it also poses security risks if misused.
+    <div class="content">
+       
+        <h2>How the Fullscreen API Works</h2>
+        <p>
+            The API allows any HTML element to be displayed fullscreen through JavaScript methods:
+        </p>
+        <ul>
+            <li><code>element.requestFullscreen()</code> - Makes an element go fullscreen</li>
+            <li><code>document.exitFullscreen()</code> - Exits fullscreen mode</li>
+        </ul>
+        <p>
+            Browsers typically display a brief notification when entering fullscreen mode, and users can exit by pressing ESC.
+        </p>
+        
+        <h2>Security Concerns</h2>
+        <p>
+            While useful, the Fullscreen API can potentially be misused to create convincing phishing attacks:
+        </p>
+        <ul>
+            <li>An attacker can make a webpage appear like a different website or operating system</li>
+            <li>When content is fullscreen, users may not see browser security indicators</li>
+            <li>Users might not realize they're interacting with a fake interface</li>
+        </ul>
+          
+        <h2>Demonstration</h2>
+        <p>
+            Click the link below to see a demonstration of how the Fullscreen API could be misused to create a convincing fake interface.
+            Remember to look for these security indicators:
+        </p>
+        <ul>
+            <li>Brief browser notification when entering fullscreen mode</li>
+            <li>Absence of URL bar and browser chrome</li>
+            <li>Ability to exit with the ESC key</li>
+        </ul>
+        
+        <a class="spoofLink" href="https://www.youtube.com" rel="noopener noreferrer">YouTube</a>
+
+    </div>
+    
+    <div class="content">
+        <h2>Protecting Yourself</h2>
+        <p>
+            To stay safe from fullscreen-based deception:
+        </p>
+        <ul>
+            <li>Be cautious when a site suddenly goes fullscreen</li>
+            <li>Remember you can always press ESC to exit fullscreen mode</li>
+            <li>Check for the browser's fullscreen notification</li>
+            <li>Be suspicious if you're asked for credentials after entering fullscreen</li>
+        </ul>
+    </div>
+  </div>
+
 
   <div id="spoofHeader">
     <div id="spoofMenu"></div>
