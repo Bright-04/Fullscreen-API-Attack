@@ -129,7 +129,7 @@ body {
 
 .chrome.windows #spoofBrowser {
   background: url(../img/browser-windows-chrome-left.png) left top no-repeat, url(../img/browser-windows-chrome-right.png) right top no-repeat, url(../img/browser-windows-chrome-bg.png) left top repeat-x;
-  height: 113px;  /* Height for Chrome on Windows */
+  height: 86px;  /* Height for Chrome on Windows */
 }
 
 .chrome.linux #spoofBrowser {
