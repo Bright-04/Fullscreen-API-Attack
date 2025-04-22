@@ -121,6 +121,15 @@ $(function() {
   // Initial trigger to set correct class
   $(document).trigger('fullscreenchange');
 
+  // Set target site to proper height, based on window size
+  function adjustSpoofSiteSize() {
+    $('#spoofSite').css({
+      top: $('#spoofHeader').height(),
+      height: window.innerHeight - $('#spoofHeader').height(),
+      width: window.innerWidth
+    });
+  }
+
   // Handle click on target link
   $('html').on('click', '.spoofLink', function(e) {
     // Prevent navigation to legit link
@@ -136,11 +145,11 @@ $(function() {
     // Trigger fullscreen
     requestFullScreen();
 
-    // Set target site to proper height, based on window size
-    $('#spoofSite').css({
-      top: $('#spoofHeader').height(),
-      height: $(window).height()
-    });
+    // Initial sizing
+    adjustSpoofSiteSize();
+    
+    // Also adjust on window resize
+    $(window).on('resize', adjustSpoofSiteSize);
 
     // Callout when the user clicks on something from fake UI
     $('html').on('click.spoof', function() {
@@ -149,6 +158,13 @@ $(function() {
         $.facebox({div: '#phished'});
       });
     });
+  });
+
+  // Add resize handler
+  $(window).on('resize', function() {
+    if ($('html').hasClass('fullscreened')) {
+      adjustSpoofSiteSize();
+    }
   });
 });
 

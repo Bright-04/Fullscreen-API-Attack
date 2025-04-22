@@ -1,5 +1,6 @@
 html.fullscreened {
   overflow-y: hidden;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
   background-color: #fff;
 }
 
@@ -10,9 +11,11 @@ html.fullscreened {
   left: 0;
   margin: 0 auto;
   overflow-y: scroll;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
   position: fixed;
   width: 100%;
   z-index: 2;
+  box-sizing: border-box; /* Include padding in width calculation */
 
   /* Updated in JS */
   top: 100px;
@@ -20,6 +23,11 @@ html.fullscreened {
 }
 .not-fullscreened #spoofSite { display: none; }
 
+#spoofSite img {
+  max-width: 100%; /* Make images responsive */
+  height: auto; /* Maintain aspect ratio */
+  display: block; /* Remove space below image */
+}
 
 #spoofHeader {
   position: fixed;
@@ -27,11 +35,13 @@ html.fullscreened {
   left: 0;  
   width: 100%;
   z-index: 2;
+  overflow: hidden; /* Prevent UI elements from causing scrollbars */
+  box-sizing: border-box; /* Include padding in width calculation */
 }
+
 .not-fullscreened #spoofHeader { display: none; }
 
 #spoofMenu, #spoofBrowser { width: 100%; }
-
 
 /* Warning banner */
 .warning-banner {
