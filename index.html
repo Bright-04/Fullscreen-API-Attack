@@ -8,6 +8,8 @@
   <title>Fullscreen API Attack</title>
   <meta name="description" content="Educational demonstration of Fullscreen API security risks">
 
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/facebox.css">
 </head>
@@ -41,7 +43,9 @@
     <p>
         The Fullscreen API is a powerful feature of modern web browsers that allows web applications to present content in fullscreen mode. 
         While it can enhance user experience, it also poses security risks if misused.
-    <div class="content">
+    </p>
+    
+    <div class="content-section">
         <h2>Demonstration</h2>
         <p>
             Click the link below to see a demonstration of how the Fullscreen API could be misused to create a convincing fake interface.
@@ -53,7 +57,9 @@
             <li>Ability to exit with the ESC key</li>
         </ul>
         
-        <a class="spoofLink" href="https://www.youtube.com" rel="noopener noreferrer">YouTube</a>
+        <a class="spoofLink" href="https://www.youtube.com" rel="noopener noreferrer">
+          YouTube
+        </a>
        
         <h2>How the Fullscreen API Works</h2>
         <p>
@@ -76,11 +82,9 @@
             <li>When content is fullscreen, users may not see browser security indicators</li>
             <li>Users might not realize they're interacting with a fake interface</li>
         </ul>
-
-
     </div>
     
-    <div class="content">
+    <div class="content-section">
         <h2>Protecting Yourself</h2>
         <p>
             To stay safe from fullscreen-based deception:
@@ -106,7 +110,7 @@
 
   <div id="phished" style="display: none;">
     <p>
-      <b>⚠️ You Have Been Phished!</b><br><br>
+      <b><span class="material-icons" style="vertical-align: middle; font-size: 28px; color: #f44336;">warning</span> You Have Been Phished!</b><br><br>
       <img src="img/haha-you-fool.jpg" alt="Warning"><br><br>
       <b style="font-size: 18px;">This is a phishing simulation.</b><br>
       You're currently viewing a <u>fake operating system and browser interface</u>.<br>
