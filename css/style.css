@@ -59,7 +59,7 @@ html.fullscreened {
 
 .chrome.windows #spoofBrowser {
   background: url(../img/browser-windows-chrome-left.png) left top no-repeat, url(../img/browser-windows-chrome-right.png) right top no-repeat, url(../img/browser-windows-chrome-bg.png) left top repeat-x;
-  height: 61px;
+  height: 86px;
 }
 
 .chrome.linux #spoofBrowser {
