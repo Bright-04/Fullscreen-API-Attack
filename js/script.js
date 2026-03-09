@@ -1,5 +1,7 @@
 // Copyright 2012 Feross Aboukhadijeh (http://feross.org) (feross@feross.org)
-// Improved version with modern browser compatibility
+// Redesigned 2026 — Cyberpunk UI/UX overhaul
+// Show/hide of #main-wrapper is handled entirely by CSS via
+// html.fullscreened and html.not-fullscreened classes.
 
 // Fix resource paths to be relative
 $.facebox.settings.closeImage = 'img/facebox/closelabel.png';
@@ -49,21 +51,15 @@ function detectBrowser() {
 
 // Function to reset the demo state
 function resetDemo() {
-  // Reset any fullscreen state
+  // Exit fullscreen if still active
   if (document.fullscreenElement) {
     exitFullScreen();
   }
-  
-  // Reset classes
+
+  // Reset classes — CSS handles showing #main-wrapper and hiding spoof elements
   $('html').removeClass('fullscreened');
   $('html').addClass('not-fullscreened');
-  
-  // Show warning banner again
-  $('.warning-banner').show();
-  
-  // Reset any other state as needed
-  $('#phished').hide();
-  
+
   // Scroll back to the top
   window.scrollTo(0, 0);
 }

@@ -4,133 +4,688 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fullscreen API Attack | Security Research Demo</title>
+  <meta name="description" content="Educational demonstration of HTML5 Fullscreen API security vulnerabilities and UI spoofing attacks targeting YouTube.com.">
 
-  <title>Fullscreen API Attack</title>
-  <meta name="description" content="Educational demonstration of Fullscreen API security risks">
+  <!-- Google Fonts: Crimson Pro + Atkinson Hyperlegible + JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono&display=swap">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <!-- Tailwind CSS Play CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            matrix: '#00FF41',
+            'matrix-dim': '#00cc33',
+            'matrix-dark': '#004d14',
+            neon: '#00d4ff',
+            danger: '#ff4444',
+            warning: '#ffaa00',
+          },
+          fontFamily: {
+            heading: ['"Crimson Pro"', 'Georgia', 'serif'],
+            body: ['"Atkinson Hyperlegible"', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', '"Fira Code"', 'monospace'],
+          },
+        }
+      }
+    }
+  </script>
+
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/facebox.css">
 </head>
-<body>
+<body class="bg-black font-body antialiased overflow-x-hidden">
 
-  <div class="warning-banner" role="alert">
-    <div class="warning-content">
-      <span class="warning-icon">⚠️</span>
-      <div class="warning-text">
-        <strong>Security Demonstration:</strong> This is an educational tool showing how malicious websites can exploit the Fullscreen API to create convincing phishing attacks. No real data is collected.
+  <!-- Scanlines Overlay -->
+  <div class="scanlines" aria-hidden="true"></div>
+
+  <!-- ============================================================
+       MAIN WRAPPER — hidden when in fullscreen (spoof active)
+       ============================================================ -->
+  <div id="main-wrapper">
+
+    <!-- Warning Banner -->
+    <div class="warning-banner" role="alert" aria-label="Security demonstration notice">
+      <div class="flex items-center justify-center gap-3 max-w-5xl mx-auto px-4 py-3">
+        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true" style="color:#ffaa00">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+        </svg>
+        <p class="text-xs text-gray-300">
+          <strong style="color:#ffaa00">Educational Security Demo:</strong>
+          This tool demonstrates HTML5 Fullscreen API phishing vulnerabilities. No real data is collected.
+        </p>
       </div>
     </div>
-  </div>
 
-  <div id="more-info" style="display: none;">
-    <p>
-      <strong>About This Security Demonstration</strong><br><br>
-      This demo illustrates how attackers can use the HTML5 Fullscreen API to create convincing fake interfaces that mimic legitimate websites and operating systems.<br><br>
-      
-      <strong>What You'll See:</strong><br>
-      • When you click the YouTube link, the page will request fullscreen permission<br>
-      • Once granted, a fake browser and OS interface will appear<br>
-      • Any interaction will reveal that you've been "phished"<br><br>
-      
-      <strong>Remember:</strong> Always verify website URLs before entering sensitive information and be cautious of unexpected fullscreen requests.
-    </p>
-  </div>
-
-  <div class="content">
-    <h1>Understanding the Fullscreen API</h1>
-    <p>
-        The Fullscreen API is a powerful feature of modern web browsers that allows web applications to present content in fullscreen mode. 
-        While it can enhance user experience, it also poses security risks if misused.
-    </p>
-    
-    <div class="content-section">
-        <h2>Demonstration</h2>
-        <p>
-            Click the link below to see a demonstration of how the Fullscreen API could be misused to create a convincing fake interface.
-            Remember to look for these security indicators:
-        </p>
-        <ul>
-            <li>Brief browser notification when entering fullscreen mode</li>
-            <li>Absence of URL bar and browser chrome</li>
-            <li>Ability to exit with the ESC key</li>
-        </ul>
-        
-        <a class="spoofLink" href="https://www.youtube.com" rel="noopener noreferrer">
-          YouTube
+    <!-- Navigation -->
+    <nav class="site-nav" role="navigation" aria-label="Main navigation">
+      <div class="nav-inner">
+        <a href="#" class="nav-logo" aria-label="Home">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.25-8.25-3.286Z" />
+          </svg>
+          <span class="font-mono text-sm font-medium">Fullscreen<span class="nav-accent">API</span>.Attack</span>
         </a>
-       
-        <h2>How the Fullscreen API Works</h2>
-        <p>
-            The API allows any HTML element to be displayed fullscreen through JavaScript methods:
+        <div class="nav-links" role="list">
+          <a href="#how-it-works" class="nav-link" role="listitem">How It Works</a>
+          <a href="#demo" class="nav-link" role="listitem">Live Demo</a>
+          <a href="#defense" class="nav-link" role="listitem">Defense</a>
+          <a href="https://github.com/feross/Fullscreen-API-Attack" target="_blank" rel="noopener noreferrer" class="nav-link-gh" role="listitem" aria-label="View source on GitHub">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2Z"/>
+            </svg>
+            GitHub
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ================================================================
+         HERO SECTION
+         ================================================================ -->
+    <section class="hero-section" aria-labelledby="hero-heading">
+      <div class="hero-grid-bg" aria-hidden="true"></div>
+      <div class="hero-content">
+
+        <!-- Badge -->
+        <div class="hero-badge" role="status">
+          <span class="badge-pulse" aria-hidden="true"></span>
+          SECURITY RESEARCH &nbsp;&middot;&nbsp; EDUCATIONAL DEMO
+        </div>
+
+        <!-- Glitch Heading -->
+        <h1 id="hero-heading" class="hero-title glitch-text" data-text="FULLSCREEN API ATTACK">
+          FULLSCREEN API ATTACK
+        </h1>
+
+        <!-- Subtitle -->
+        <p class="hero-subtitle">
+          Discover how the HTML5 Fullscreen API enables convincing UI spoofing attacks &mdash;
+          capable of simulating complete browser interfaces and tricking users into believing
+          they&rsquo;re on legitimate websites like YouTube.
         </p>
-        <ul>
-            <li><code>element.requestFullscreen()</code> - Makes an element go fullscreen</li>
-            <li><code>document.exitFullscreen()</code> - Exits fullscreen mode</li>
-        </ul>
-        <p>
-            Browsers typically display a brief notification when entering fullscreen mode, and users can exit by pressing ESC.
-        </p>
-        
-        <h2>Security Concerns</h2>
-        <p>
-            While useful, the Fullscreen API can potentially be misused to create convincing phishing attacks:
-        </p>
-        <ul>
-            <li>An attacker can make a webpage appear like a different website or operating system</li>
-            <li>When content is fullscreen, users may not see browser security indicators</li>
-            <li>Users might not realize they're interacting with a fake interface</li>
-        </ul>
-    </div>
-    
-    <div class="content-section">
-        <h2>Protecting Yourself</h2>
-        <p>
-            To stay safe from fullscreen-based deception:
-        </p>
-        <ul>
-            <li>Be cautious when a site suddenly goes fullscreen</li>
-            <li>Remember you can always press ESC to exit fullscreen mode</li>
-            <li>Check for the browser's fullscreen notification</li>
-            <li>Be suspicious if you're asked for credentials after entering fullscreen</li>
-        </ul>
+
+        <!-- Terminal Window -->
+        <div class="terminal-window" role="complementary" aria-label="Attack code demonstration">
+          <div class="terminal-header">
+            <div class="term-dots" aria-hidden="true">
+              <span class="term-dot dot-red"></span>
+              <span class="term-dot dot-yellow"></span>
+              <span class="term-dot dot-green"></span>
+            </div>
+            <span class="term-title">attack_demo.js</span>
+            <span aria-hidden="true"></span>
+          </div>
+          <div class="terminal-body" aria-hidden="true">
+            <div class="t-line"><span class="t-comment">// Step 1 &mdash; Intercept user click on a fake link</span></div>
+            <div class="t-line"><span class="t-key">document</span><span class="t-dot">.</span><span class="t-fn">addEventListener</span><span class="t-paren">(</span><span class="t-str">'click'</span><span class="t-paren">, () =&gt; {</span></div>
+            <div class="t-line t-indent"><span class="t-key">document</span><span class="t-dot">.</span><span class="t-fn">documentElement</span></div>
+            <div class="t-line t-indent2"><span class="t-dot">.</span><span class="t-fn">requestFullscreen</span><span class="t-paren">()</span><span class="t-semi">;</span></div>
+            <div class="t-line"><span class="t-paren">});</span></div>
+            <div class="t-line t-empty">&nbsp;</div>
+            <div class="t-line"><span class="t-comment">// Step 2 &mdash; Inject fake OS + browser chrome</span></div>
+            <div class="t-line"><span class="t-fn">renderSpoofedBrowser</span><span class="t-paren">(</span><span class="t-str">"youtube.com"</span><span class="t-paren">)</span><span class="t-semi">;</span></div>
+            <div class="t-line t-empty">&nbsp;</div>
+            <div class="t-line"><span class="t-comment">// Step 3 &mdash; Wait for victim interaction</span></div>
+            <div class="t-line"><span class="t-key">window</span><span class="t-dot">.</span><span class="t-fn">addEventListener</span><span class="t-paren">(</span><span class="t-str">'click'</span><span class="t-paren">, () =&gt; triggerReveal())</span><span class="t-semi">;</span></div>
+            <div class="t-line"><span class="t-cursor" aria-hidden="true">&#9608;</span></div>
+          </div>
+        </div>
+
+        <!-- CTAs -->
+        <div class="hero-ctas">
+          <a href="#demo" class="cta-primary" aria-label="Jump to the live demo section">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" />
+            </svg>
+            Launch Demo
+          </a>
+          <a href="#how-it-works" class="cta-secondary" aria-label="Learn how the attack works">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+            </svg>
+            Learn More
+          </a>
+        </div>
+
+        <!-- Stats Row -->
+        <div class="hero-stats" aria-label="Key facts">
+          <div class="stat-item">
+            <span class="stat-value">2012</span>
+            <span class="stat-label">Original Research</span>
+          </div>
+          <div class="stat-divider" aria-hidden="true"></div>
+          <div class="stat-item">
+            <span class="stat-value">All</span>
+            <span class="stat-label">Modern Browsers</span>
+          </div>
+          <div class="stat-divider" aria-hidden="true"></div>
+          <div class="stat-item">
+            <span class="stat-value">YouTube</span>
+            <span class="stat-label">Spoofed Target</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================================================================
+         HOW THE ATTACK WORKS
+         ================================================================ -->
+    <section id="how-it-works" class="content-section" aria-labelledby="attack-heading">
+      <div class="section-inner">
+        <div class="section-header">
+          <div class="section-badge">THREAT MODEL</div>
+          <h2 id="attack-heading" class="section-title">How the Attack Works</h2>
+          <p class="section-subtitle">A three-phase exploit chain abusing legitimate browser fullscreen capabilities</p>
+        </div>
+
+        <div class="attack-steps-grid">
+          <div class="step-card" role="article">
+            <div class="step-number" aria-hidden="true">01</div>
+            <div class="step-icon" aria-hidden="true">
+              <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
+              </svg>
+            </div>
+            <h3 class="step-title">Lure with a Link</h3>
+            <p class="step-desc">
+              An attacker embeds a seemingly legitimate link on a malicious page &mdash; styled to look
+              like a YouTube video, article, or login button that the target would naturally click.
+            </p>
+          </div>
+
+          <div class="step-card" role="article">
+            <div class="step-number" aria-hidden="true">02</div>
+            <div class="step-icon" aria-hidden="true">
+              <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0H3" />
+              </svg>
+            </div>
+            <h3 class="step-title">Inject Fake Browser UI</h3>
+            <p class="step-desc">
+              On click, <code class="inline-code">requestFullscreen()</code> activates fullscreen.
+              A pixel-perfect OS and browser chrome overlay renders, making it appear to be
+              a real browser window showing youtube.com.
+            </p>
+          </div>
+
+          <div class="step-card" role="article">
+            <div class="step-number" aria-hidden="true">03</div>
+            <div class="step-icon" aria-hidden="true">
+              <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 0 1 18.75 8.25Z" />
+              </svg>
+            </div>
+            <h3 class="step-title">Harvest Credentials</h3>
+            <p class="step-desc">
+              The victim believes they&rsquo;re on the real YouTube site. Any interactions &mdash; especially
+              entering login credentials &mdash; are captured by the attacker. ESC is the only escape.
+            </p>
+          </div>
+        </div>
+
+        <!-- Attack Flow Diagram -->
+        <div class="attack-flow" aria-label="Attack flow diagram">
+          <div class="flow-item">
+            <div class="flow-icon">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+              </svg>
+            </div>
+            <span>Victim visits malicious page</span>
+          </div>
+          <div class="flow-arrow" aria-hidden="true">&rarr;</div>
+          <div class="flow-item">
+            <div class="flow-icon">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+              </svg>
+            </div>
+            <span>Clicks a lure link</span>
+          </div>
+          <div class="flow-arrow" aria-hidden="true">&rarr;</div>
+          <div class="flow-item">
+            <div class="flow-icon">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
+              </svg>
+            </div>
+            <span>Fullscreen activated</span>
+          </div>
+          <div class="flow-arrow" aria-hidden="true">&rarr;</div>
+          <div class="flow-item flow-item-danger">
+            <div class="flow-icon">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25z" />
+              </svg>
+            </div>
+            <span>Credentials harvested</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================================================================
+         API TECHNICAL DEEP DIVE
+         ================================================================ -->
+    <section class="content-section alt-bg" aria-labelledby="api-heading">
+      <div class="section-inner">
+        <div class="section-header">
+          <div class="section-badge">TECHNICAL</div>
+          <h2 id="api-heading" class="section-title">The Fullscreen API</h2>
+          <p class="section-subtitle">A legitimate browser feature weaponized for UI deception</p>
+        </div>
+
+        <div class="tech-grid">
+          <div class="tech-explanation">
+            <p class="tech-para">
+              The HTML5 Fullscreen API allows any web page to expand a DOM element to cover the
+              entire screen, hiding the browser&rsquo;s address bar, tabs, and all security indicators.
+              While designed for video players and games, it can be abused to simulate entire
+              operating system and browser interfaces.
+            </p>
+            <p class="tech-para">
+              The API requires a user gesture (click) to activate, providing minimal protection.
+              Once in fullscreen, the browser shows only a brief, dismissible notification &mdash;
+              easily overlooked by unsuspecting users.
+            </p>
+
+            <div class="api-methods-grid">
+              <div class="api-method-card">
+                <div class="method-badge enter">ENTER</div>
+                <code class="method-code">element.requestFullscreen()</code>
+                <p class="method-desc">Requests the element be displayed in fullscreen mode. Requires a user interaction to invoke.</p>
+              </div>
+              <div class="api-method-card">
+                <div class="method-badge exit">EXIT</div>
+                <code class="method-code">document.exitFullscreen()</code>
+                <p class="method-desc">Programmatically exits fullscreen. ESC key always works &mdash; this cannot be overridden by web pages.</p>
+              </div>
+              <div class="api-method-card">
+                <div class="method-badge event">EVENT</div>
+                <code class="method-code">fullscreenchange</code>
+                <p class="method-desc">Fires when the browser enters or exits fullscreen, allowing state-based UI manipulation.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="vulnerability-card" role="note" aria-label="Security vulnerability details">
+            <div class="vuln-header">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" style="color:#ff4444">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0-10.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.248-8.25-3.286Zm0 13.036h.008v.008H12v-.008Z" />
+              </svg>
+              <h3>Why This Works</h3>
+            </div>
+            <ul class="vuln-list" aria-label="Vulnerability reasons">
+              <li><span class="vuln-dot" aria-hidden="true"></span>Browser notification is brief and easily missed</li>
+              <li><span class="vuln-dot" aria-hidden="true"></span>All browser chrome (URL bar, tabs) disappears</li>
+              <li><span class="vuln-dot" aria-hidden="true"></span>Fake OS UI is visually indistinguishable</li>
+              <li><span class="vuln-dot" aria-hidden="true"></span>Victim trusts the familiar YouTube interface</li>
+              <li><span class="vuln-dot" aria-hidden="true"></span>No malware required &mdash; pure web technology</li>
+            </ul>
+            <div class="vuln-footer">
+              <div class="cve-badge">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+                </svg>
+                Originally discovered by Feross Aboukhadijeh, 2012
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================
+         INTERACTIVE DEMO SECTION
+         ================================================================ -->
+    <section id="demo" class="content-section demo-section" aria-labelledby="demo-heading">
+      <div class="section-inner">
+        <div class="section-header">
+          <div class="section-badge danger-badge">LIVE DEMO</div>
+          <h2 id="demo-heading" class="section-title">Interactive Demonstration</h2>
+          <p class="section-subtitle">Experience the YouTube spoofing attack firsthand in a safe, controlled environment</p>
+        </div>
+
+        <div class="demo-warning-card" role="note" aria-label="Demo instructions">
+          <div class="demo-warning-header">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+            </svg>
+            <strong>Before You Begin</strong>
+          </div>
+          <ul class="demo-checklist" aria-label="Demo instructions">
+            <li>
+              <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true" style="color:#00FF41">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+              </svg>
+              Your browser will ask permission to enter fullscreen &mdash; click <strong>Allow</strong>
+            </li>
+            <li>
+              <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true" style="color:#00FF41">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+              </svg>
+              Watch for the browser&rsquo;s brief fullscreen notification at the top of the screen
+            </li>
+            <li>
+              <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true" style="color:#00FF41">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+              </svg>
+              Click anywhere on the fake YouTube interface to trigger the reveal
+            </li>
+            <li>
+              <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true" style="color:#00FF41">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+              </svg>
+              Press <kbd class="kbd">ESC</kbd> at any time to safely exit fullscreen
+            </li>
+          </ul>
+        </div>
+
+        <!-- Fake page context wrapper -->
+        <div class="demo-trigger-area">
+          <p class="demo-context-text">
+            The link below simulates content you might encounter on a malicious webpage.
+            It appears to navigate to YouTube &mdash; but instead launches the spoofing attack.
+          </p>
+
+          <div class="fake-page-ctx" role="presentation">
+            <div class="fake-page-header">
+              <div class="fake-bar-dots" aria-hidden="true">
+                <span></span><span></span><span></span>
+              </div>
+              <div class="fake-url-bar">
+                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true" style="color:#6b7280">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                </svg>
+                <span class="fake-url-text">attacker-website.com/watch-later</span>
+              </div>
+            </div>
+            <div class="fake-page-body">
+              <h4 class="fake-article-title">Top 10 Must-Watch Videos This Week</h4>
+              <p class="fake-article-text">
+                Check out this incredible compilation available on YouTube.
+                The full playlist is linked below &mdash; click to watch:
+              </p>
+              <div class="fake-link-wrapper">
+                <a class="spoofLink" href="https://www.youtube.com" aria-label="Launch the YouTube spoofing demonstration">
+                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                  </svg>
+                  Watch on YouTube
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- What to observe -->
+        <div class="observe-grid">
+          <div class="observe-card">
+            <div class="observe-num" aria-hidden="true">1</div>
+            <h4>Fullscreen Notification</h4>
+            <p>Your browser briefly shows a notification. Most users miss or dismiss it instinctively.</p>
+          </div>
+          <div class="observe-card">
+            <div class="observe-num" aria-hidden="true">2</div>
+            <h4>Fake Browser Chrome</h4>
+            <p>A pixel-accurate replica of your OS and browser appears, complete with a spoofed YouTube URL bar.</p>
+          </div>
+          <div class="observe-card">
+            <div class="observe-num" aria-hidden="true">3</div>
+            <h4>Zero Visual Difference</h4>
+            <p>The fake YouTube interface is visually identical to the real one &mdash; this is the attack&rsquo;s power.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================================================================
+         DEFENSE SECTION
+         ================================================================ -->
+    <section id="defense" class="content-section" aria-labelledby="defense-heading">
+      <div class="section-inner">
+        <div class="section-header">
+          <div class="section-badge">DEFENSE</div>
+          <h2 id="defense-heading" class="section-title">Protecting Yourself</h2>
+          <p class="section-subtitle">Key practices to identify and avoid fullscreen-based UI spoofing attacks</p>
+        </div>
+
+        <div class="defense-grid">
+          <div class="defense-card" role="article">
+            <div class="defense-icon" aria-hidden="true">
+              <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+              </svg>
+            </div>
+            <h3 class="defense-title">Heed the Notification</h3>
+            <p class="defense-desc">Browsers always show a notification when entering fullscreen. If a site triggered it unexpectedly, exit immediately with <kbd class="kbd">ESC</kbd>.</p>
+          </div>
+
+          <div class="defense-card" role="article">
+            <div class="defense-icon" aria-hidden="true">
+              <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5a17.92 17.92 0 0 1-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418" />
+              </svg>
+            </div>
+            <h3 class="defense-title">Always Verify the URL</h3>
+            <p class="defense-desc">Press <kbd class="kbd">ESC</kbd> and check the real address bar before entering credentials. A fake interface can spoof the display &mdash; not the actual URL.</p>
+          </div>
+
+          <div class="defense-card" role="article">
+            <div class="defense-icon" aria-hidden="true">
+              <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25z" />
+              </svg>
+            </div>
+            <h3 class="defense-title">ESC Always Works</h3>
+            <p class="defense-desc">No website can override the browser&rsquo;s <kbd class="kbd">ESC</kbd> key behavior to exit fullscreen. It&rsquo;s your guaranteed escape &mdash; and it cannot be blocked.</p>
+          </div>
+
+          <div class="defense-card" role="article">
+            <div class="defense-icon" aria-hidden="true">
+              <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+              </svg>
+            </div>
+            <h3 class="defense-title">Look for Subtle Tells</h3>
+            <p class="defense-desc">Spoofed interfaces may have pixel imperfections, wrong system fonts, or inconsistent scaling. Real websites never request fullscreen just to show content.</p>
+          </div>
+
+          <div class="defense-card" role="article">
+            <div class="defense-icon" aria-hidden="true">
+              <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
+              </svg>
+            </div>
+            <h3 class="defense-title">Be Sceptical of Requests</h3>
+            <p class="defense-desc">Video players and games may legitimately use fullscreen. But a general webpage or a link destination should <em>never</em> need to enter fullscreen on click.</p>
+          </div>
+
+          <div class="defense-card" role="article">
+            <div class="defense-icon" aria-hidden="true">
+              <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.25-8.25-3.286Z" />
+              </svg>
+            </div>
+            <h3 class="defense-title">Keep Browsers Updated</h3>
+            <p class="defense-desc">Modern browsers have improved fullscreen notifications and protections. Always use the latest version and enable automatic security updates.</p>
+          </div>
+        </div>
+
+        <div class="mitigation-note" role="note" aria-label="Browser security note">
+          <div class="mit-icon" aria-hidden="true">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+            </svg>
+          </div>
+          <div>
+            <h4>Modern Browser Mitigations</h4>
+            <p>Since Feross&rsquo;s original 2012 disclosure, browsers have added mandatory user-gesture requirements, prominent fullscreen banners, ESC key protections, and visual indicators that cannot be hidden by web pages. However, social engineering remains effective &mdash; user awareness is still the strongest defense.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================================================================
+         FOOTER
+         ================================================================ -->
+    <footer class="site-footer" role="contentinfo">
+      <div class="footer-inner">
+        <div class="footer-brand-col">
+          <div class="footer-logo">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.25-8.25-3.286Z" />
+            </svg>
+            <span class="font-mono font-medium">Fullscreen<span class="nav-accent">API</span>.Attack</span>
+          </div>
+          <p class="footer-tagline">Educational security research demonstrating HTML5 Fullscreen API vulnerabilities. No real data is collected.</p>
+        </div>
+
+        <div class="footer-links-col">
+          <h4 class="footer-col-title">Resources</h4>
+          <ul class="footer-link-list" aria-label="External resources">
+            <li><a href="https://github.com/feross/Fullscreen-API-Attack" target="_blank" rel="noopener noreferrer">GitHub Repository</a></li>
+            <li><a href="http://feross.org/html5-fullscreen-api-attack/" target="_blank" rel="noopener noreferrer">Original Research (2012)</a></li>
+            <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API" target="_blank" rel="noopener noreferrer">MDN: Fullscreen API</a></li>
+            <li><a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer">YouTube.com (Real)</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-team-col">
+          <h4 class="footer-col-title">Research Team</h4>
+          <ul class="footer-team-list" aria-label="Team members">
+            <li><span class="team-id">22110052</span> &mdash; &#272;&#7863;ng H&#7919;u L&#7897;c</li>
+            <li><span class="team-id">22110065</span> &mdash; Nguy&#7877;n Nh&#7853;t Quang</li>
+            <li><span class="team-id">22110067</span> &mdash; Nguy&#7877;n Quang S&#225;ng</li>
+            <li><span class="team-id">22110020</span> &mdash; H&#7891; Th&#224;nh &#272;&#7841;t</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>MIT License &nbsp;&middot;&nbsp; Original research by <a href="http://feross.org" target="_blank" rel="noopener noreferrer">Feross Aboukhadijeh</a> (2012) &nbsp;&middot;&nbsp; For educational purposes only</p>
+      </div>
+    </footer>
+
+  </div><!-- /#main-wrapper -->
+
+  <!-- ============================================================
+       HIDDEN FACEBOX CONTENT
+       ============================================================ -->
+  <div id="more-info" style="display: none;">
+    <div class="facebox-inner">
+      <h3 class="facebox-title">About This Security Demonstration</h3>
+      <p>This demo illustrates how attackers can use the HTML5 Fullscreen API to create convincing fake interfaces that mimic legitimate websites.</p>
+      <h4>What You'll See:</h4>
+      <ul>
+        <li>Clicking the YouTube link requests fullscreen permission</li>
+        <li>A fake browser and OS interface appears</li>
+        <li>Any interaction reveals you've been "phished"</li>
+      </ul>
+      <p><strong>Remember:</strong> Always verify website URLs before entering sensitive information.</p>
     </div>
   </div>
 
-
-  <div id="spoofHeader">
+  <!-- ============================================================
+       SPOOF ELEMENTS — Required for JS (DO NOT REMOVE)
+       ============================================================ -->
+  <div id="spoofHeader" aria-hidden="true">
     <div id="spoofMenu"></div>
     <div id="spoofBrowser"></div>
   </div>
 
-  <div id="spoofSite">
-    <img src="img/YouTube-HQ.png" alt="YouTube screenshot">
+  <div id="spoofSite" aria-hidden="true">
+    <img src="img/Youtube-HQ.png" alt="Spoofed YouTube interface">
   </div>
 
-  <div id="phished" style="display: none;">
-    <p>
-      <b><span class="material-icons" style="vertical-align: middle; font-size: 28px; color: #f44336;">warning</span> You Have Been Phished!</b><br><br>
-      <img src="img/haha-you-fool.jpg" alt="Warning"><br><br>
-      <b style="font-size: 18px;">This is a phishing simulation.</b><br>
-      You're currently viewing a <u>fake operating system and browser interface</u>.<br>
-      Be cautious — always verify URLs and avoid entering sensitive information on suspicious pages.
-      <br><br>
-      <b>Team Members:</b><br>
-      Đặng Hữu Lộc - 22110052<br>
-      Nguyễn Nhật Quang - 22110065<br>
-      Nguyễn Quang Sáng - 22110067<br>
-      Hồ Thành Đạt - 22110020
-      <br><br>
-    </p>
+  <!-- ============================================================
+       PHISHED REVEAL — Shown via Facebox after fullscreen interaction
+       ============================================================ -->
+  <div id="phished" style="display: none;" aria-hidden="true">
+    <div class="phished-container">
+      <div class="phished-term-header">
+        <div class="term-dots" aria-hidden="true">
+          <span class="term-dot dot-red"></span>
+          <span class="term-dot dot-yellow"></span>
+          <span class="term-dot dot-green"></span>
+        </div>
+        <span class="phished-term-title">security_breach.log</span>
+        <span></span>
+      </div>
+
+      <div class="phished-icon-wrap" aria-hidden="true">
+        <svg class="phished-icon" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0-10.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.248-8.25-3.286Zm0 13.036h.008v.008H12v-.008Z" />
+        </svg>
+      </div>
+
+      <h2 class="phished-title">YOU'VE BEEN PHISHED</h2>
+      <p class="phished-subtitle">This was a simulated phishing attack using the HTML5 Fullscreen API.</p>
+
+      <div class="phished-reveal-box">
+        <p class="phished-reveal-text">
+          You were interacting with a <strong>fake OS and browser interface</strong>.
+          In a real attack, any credentials entered would have been captured by the attacker.
+        </p>
+      </div>
+
+      <div class="phished-tips">
+        <h4 class="phished-tips-title">Key Takeaways</h4>
+        <ul class="phished-tip-list">
+          <li>
+            <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" aria-hidden="true" style="color:#00FF41">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+            </svg>
+            Always press <strong>ESC</strong> if a site unexpectedly goes fullscreen
+          </li>
+          <li>
+            <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" aria-hidden="true" style="color:#00FF41">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+            </svg>
+            Check the real URL bar before entering any credentials
+          </li>
+          <li>
+            <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" aria-hidden="true" style="color:#00FF41">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+            </svg>
+            Take the fullscreen notification seriously &mdash; don't dismiss it blindly
+          </li>
+        </ul>
+      </div>
+
+      <div class="phished-fool-img">
+        <img src="img/haha-you-fool.jpg" alt="Haha, you fool!">
+      </div>
+
+      <div class="phished-team">
+        <p class="phished-team-label">Demo created by:</p>
+        <div class="phished-team-grid">
+          <span>&#272;&#7863;ng H&#7919;u L&#7897;c <em>22110052</em></span>
+          <span>Nguy&#7877;n Nh&#7853;t Quang <em>22110065</em></span>
+          <span>Nguy&#7877;n Quang S&#225;ng <em>22110067</em></span>
+          <span>H&#7891; Th&#224;nh &#272;&#7841;t <em>22110020</em></span>
+        </div>
+      </div>
+    </div>
   </div>
 
+  <!-- Scripts -->
   <script src="js/libs/jquery-1.7.2.js"></script>
   <script src="js/libs/jquery-ui-1.8.18.custom.min.js"></script>
   <script src="js/libs/facebox.js"></script>
   <script src="js/libs/browser-detect.js"></script>
   <script src="js/libs/fullscreen-api-shim.js"></script>
-
+  <script src="js/plugins.js"></script>
   <script src="js/script.js"></script>
 
 </body>
